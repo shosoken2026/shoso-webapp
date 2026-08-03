@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <title>勝創建 出面管理</title>
+  <style>
+    :root{
+      --bg:#f3f4f6;--card:#fff;--ink:#111827;--muted:#6b7280;
+      --line:#e5e7eb;--accent:#111827;--danger:#b91c1c;--ok:#166534;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    header{position:sticky;top:0;z-index:10;background:var(--accent);color:white;padding:16px 16px 14px}
+    header h1{margin:0;font-size:20px}
+    header p{margin:4px 0 0;font-size:12px;opacity:.8}
+    main{max-width:900px;margin:0 auto;padding:14px}
+    .card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+    h2{font-size:16px;margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+    input,select,button{width:100%;font-size:16px;border-radius:10px;border:1px solid var(--line);padding:11px;background:white}
+    button{font-weight:700;cursor:pointer}
+    .primary{background:var(--accent);color:white;border-color:var(--accent)}
+    .secondary{background:#fff}
+    .danger{color:var(--danger);border-color:#fecaca;background:#fff}
+    .row{display:flex;gap:8px}
+    .row>*{flex:1}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .stat{background:#f9fafb;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+    .stat strong{display:block;font-size:22px}
+    .stat span{font-size:11px;color:var(--muted)}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:650px}
+    th,td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
+    th{color:var(--muted);font-weight:600;background:#fafafa}
+    .pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#eef2ff;font-size:12px}
+    .empty{text-align:center;color:var(--muted);padding:18px}
+    .footer-note{font-size:12px;color:var(--muted);line-height:1.6}
+    .install{background:#fffbeb;border:1px solid #fde68a}
+    @media(max-width:640px){
+      .grid,.grid-3{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>勝創建 出面管理</h1>
+  <p>1日＝1人工／半日＝0.5人工</p>
+</header>
+
+<main>
+  <section class="card install">
+    <h2>使い方</h2>
+    <div class="footer-note">
+      この画面を<strong>Safariで開いた場合</strong>に登録ボタンが動きます。ChatGPT内のプレビューや「ファイル」アプリのプレビューでは動かない場合があります。<br>
+      Safariで開いた後、共有ボタン →「ホーム画面に追加」でアプリのように使えます。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>出面を入力</h2>
+    <div class="grid">
+      <div>
+        <label for="date">日付</label>
+        <input id="date" type="date" />
+      </div>
+      <div>
+        <label for="worker">名前</label>
+        <input id="worker" type="text" placeholder="例：たけし" />
+      </div>
+      <div>
+        <label for="site">現場名</label>
+        <input id="site" type="text" placeholder="例：杉並宮前" />
+      </div>
+      <div>
+        <label for="amount">出面</label>
+        <select id="amount">
+          <option value="1">1日（1人工）</option>
+          <option value="0.5">半日（0.5人工）</option>
+          <option value="0">休み（0人工）</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <label for="memo">メモ</label>
+      <input id="memo" type="text" placeholder="任意" />
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="addBtn">登録する</button>
+      <button class="secondary" id="clearFormBtn">入力を消す</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>集計</h2>
+    <div class="grid-3" style="margin-bottom:10px">
+      <div>
+        <label for="monthFilter">対象月</label>
+        <input id="monthFilter" type="month" />
+      </div>
+      <div>
+        <label for="workerFilter">名前で絞る</label>
+        <input id="workerFilter" type="text" placeholder="全員" />
+      </div>
+      <div>
+        <label for="siteFilter">現場で絞る</label>
+        <input id="siteFilter" type="text" placeholder="全現場" />
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><strong id="totalEntries">0</strong><span>登録件数</span></div>
+      <div class="stat"><strong id="totalManDays">0</strong><span>合計人工</span></div>
+      <div class="stat"><strong id="workerCount">0</strong><span>人数</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row" style="align-items:center;margin-bottom:8px">
+      <h2 style="margin:0;flex:2">出面一覧</h2>
+      <button id="csvBtn">CSV出力</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>日付</th><th>名前</th><th>現場</th><th>出面</th><th>メモ</th><th></th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>名前別合計</h2>
+    <div class="table-wrap">
+      <table style="min-width:400px">
+        <thead><tr><th>名前</th><th>合計人工</th><th>登録件数</th></tr></thead>
+        <tbody id="summaryBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <button class="danger" id="deleteAllBtn">すべてのデータを削除</button>
+  </section>
+</main>
+
+<script>
+const KEY = "shoso_attendance_v2";
+let memoryStore = [];
+function loadRecords(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){
+    return memoryStore;
+  }
+}
+function persistRecords(data){
+  try{
+    localStorage.setItem(KEY, JSON.stringify(data));
+  }catch(e){
+    memoryStore = data;
+  }
+}
+let records = loadRecords();
+
+const $ = id => document.getElementById(id);
+const today = new Date();
+$("date").value = today.toISOString().slice(0,10);
+$("monthFilter").value = today.toISOString().slice(0,7);
+
+function save(){
+  persistRecords(records);
+  render();
+}
+function clearForm(){
+  $("worker").value = "";
+  $("site").value = "";
+  $("amount").value = "1";
+  $("memo").value = "";
+}
+function filtered(){
+  const m = $("monthFilter").value;
+  const w = $("workerFilter").value.trim().toLowerCase();
+  const s = $("siteFilter").value.trim().toLowerCase();
+  return records
+    .filter(r => !m || r.date.startsWith(m))
+    .filter(r => !w || r.worker.toLowerCase().includes(w))
+    .filter(r => !s || r.site.toLowerCase().includes(s))
+    .sort((a,b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+}
+function render(){
+  const data = filtered();
+  $("totalEntries").textContent = data.length;
+  $("totalManDays").textContent = data.reduce((sum,r)=>sum+Number(r.amount),0).toFixed(1).replace(".0","");
+  $("workerCount").textContent = new Set(data.map(r=>r.worker)).size;
+
+  $("tbody").innerHTML = data.length ? data.map(r => `
+    <tr>
+      <td>${escapeHtml(r.date)}</td>
+      <td><span class="pill">${escapeHtml(r.worker)}</span></td>
+      <td>${escapeHtml(r.site)}</td>
+      <td>${Number(r.amount)}</td>
+      <td>${escapeHtml(r.memo || "")}</td>
+      <td><button class="danger" style="padding:6px 8px;font-size:12px" onclick="removeRecord('${r.id}')">削除</button></td>
+    </tr>`).join("") : `<tr><td colspan="6" class="empty">データがありません</td></tr>`;
+
+  const sum = {};
+  data.forEach(r=>{
+    if(!sum[r.worker]) sum[r.worker] = {days:0,count:0};
+    sum[r.worker].days += Number(r.amount);
+    sum[r.worker].count += 1;
+  });
+  const rows = Object.entries(sum).sort((a,b)=>b[1].days-a[1].days);
+  $("summaryBody").innerHTML = rows.length ? rows.map(([name,v])=>`
+    <tr><td>${escapeHtml(name)}</td><td>${v.days.toFixed(1).replace(".0","")}</td><td>${v.count}</td></tr>
+  `).join("") : `<tr><td colspan="3" class="empty">集計データがありません</td></tr>`;
+}
+function escapeHtml(v){
+  return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+window.removeRecord = function(id){
+  if(confirm("このデータを削除しますか？")){
+    records = records.filter(r=>r.id!==id);
+    save();
+  }
+}
+$("addBtn").addEventListener("click", ()=>{
+  const date = $("date").value;
+  const worker = $("worker").value.trim();
+  const site = $("site").value.trim();
+  if(!date || !worker || !site){
+    alert("日付・名前・現場名を入力してください");
+    return;
+  }
+  records.push({
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()),
+    date, worker, site,
+    amount: Number($("amount").value),
+    memo: $("memo").value.trim(),
+    createdAt: Date.now()
+  });
+  save();
+  clearForm();
+});
+$("clearFormBtn").addEventListener("click", clearForm);
+["monthFilter","workerFilter","siteFilter"].forEach(id => $(id).addEventListener("input", render));
+
+$("csvBtn").addEventListener("click", ()=>{
+  const data = filtered();
+  if(!data.length){ alert("出力するデータがありません"); return; }
+  const rows = [["日付","名前","現場","出面","メモ"], ...data.map(r=>[r.date,r.worker,r.site,r.amount,r.memo||""])];
+  const csv = "\uFEFF" + rows.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url;
+  a.download=`勝創建_出面_${$("monthFilter").value || "全期間"}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+$("deleteAllBtn").addEventListener("click", ()=>{
+  if(confirm("本当にすべて削除しますか？この操作は元に戻せません。")){
+    records = [];
+    save();
+  }
+});
+render();
+</script>
+</body>
+</html>
