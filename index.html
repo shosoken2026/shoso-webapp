@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>勝創建 管理アプリ</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div><h1>勝創建 管理アプリ</h1><small id="sync">接続待ち</small></div>
+  <button id="logout" class="mini hidden">ログアウト</button>
+</header>
+
+<section id="loginView" class="login">
+  <div class="card login-card">
+    <h2>ログイン</h2>
+    <label>メールアドレス</label><input id="email" type="email">
+    <label>パスワード</label><input id="password" type="password">
+    <button id="loginBtn" class="primary">ログイン</button>
+    <button id="signupBtn">新規アカウント作成</button>
+    <p id="message" class="error"></p>
+  </div>
+</section>
+
+<section id="appView" class="hidden">
+<nav id="nav">
+  <button class="on" data-page="home">🏠ホーム</button>
+  <button data-page="att">👷出面</button>
+  <button data-page="profit" data-admin>💰利益</button>
+  <button data-page="expense" data-admin>💳経費</button>
+  <button data-page="material">📦材料</button>
+  <button data-page="bill" data-admin>📄請求</button>
+  <button data-page="settings" data-admin>⚙️登録</button>
+</nav>
+<main>
+<section id="home" class="page on">
+  <div class="card"><div class="title"><h2>今日と今月</h2><span id="role" class="badge"></span></div>
+    <div class="stats"><div class="stat"><b id="hToday">0</b><span>今日の人工</span></div><div class="stat admin"><b id="hProfit">¥0</b><span>今月利益</span></div><div class="stat admin"><b id="hUnpaid">¥0</b><span>未入金</span></div></div>
+  </div>
+  <div class="card"><h2>現場一覧</h2><div id="siteSummary"></div></div>
+</section>
+
+<section id="att" class="page">
+  <div class="card"><h2>出面登録</h2>
+    <div class="grid"><div><label>日付</label><input id="aDate" type="date"></div><div><label>現場</label><select id="aSite"></select></div><div><label>区分</label><select id="aKind"><option>自社</option><option>応援</option></select></div></div>
+    <p class="muted">人をタップ</p><div id="people" class="people"></div>
+    <div class="row top"><button id="full" class="primary">1日</button><button id="half">半日</button></div>
+    <button id="saveAtt" class="primary top">登録</button>
+  </div>
+  <div class="card"><div class="title"><h2>月別集計</h2><input id="aMonth" type="month" class="compact"></div>
+    <div class="stats"><div class="stat"><b id="aTotal">0</b><span>人工</span></div><div class="stat"><b id="aCount">0</b><span>件数</span></div><div class="stat"><b id="aPeople">0</b><span>人数</span></div></div>
+    <div class="table"><table><thead><tr><th>日付</th><th>名前</th><th>現場</th><th>区分</th><th>人工</th><th></th></tr></thead><tbody id="aTable"></tbody></table></div>
+  </div>
+</section>
+
+<section id="profit" class="page admin">
+  <div class="card"><h2>利益計算</h2>
+    <div class="grid"><div><label>月</label><input id="pMonth" type="month"></div><div><label>現場</label><select id="pSite"></select></div><div><label>平米数</label><input id="sqm" type="number"></div><div><label>平米単価</label><input id="sqmPrice" type="number"></div><div><label>人工数</label><input id="days" type="number"></div><div><label>人工単価</label><input id="dayPrice" type="number"></div><div><label>材料費</label><input id="matCost" type="number"></div><div><label>応援費</label><input id="supportCost" type="number"></div><div><label>その他原価</label><input id="otherCost" type="number"></div></div>
+    <div class="stats top"><div class="stat"><b id="sales">¥0</b><span>売上</span></div><div class="stat"><b id="cost">¥0</b><span>原価＋経費</span></div><div class="stat"><b id="gain">¥0</b><span>利益</span></div></div>
+    <button id="saveProfit" class="primary top">保存</button>
+  </div>
+  <div class="card"><h2>利益一覧</h2><div class="table"><table><thead><tr><th>月</th><th>現場</th><th>売上</th><th>原価</th><th>利益</th><th></th></tr></thead><tbody id="pTable"></tbody></table></div></div>
+</section>
+
+<section id="expense" class="page admin">
+  <div class="card"><h2>経費登録</h2>
+    <div class="grid"><div><label>日付</label><input id="eDate" type="date"></div><div><label>現場</label><select id="eSite"></select></div><div><label>分類</label><select id="eType"><option>駐車場代</option><option>ガソリン代</option><option>道具代</option><option>高速代</option><option>運搬費</option><option>斫り代</option><option>応援代</option><option>その他</option></select></div><div><label>金額</label><input id="eAmount" type="number"></div><div><label>支払先</label><input id="ePayee"></div></div>
+    <button id="saveExp" class="primary top">登録</button>
+  </div>
+  <div class="card"><div class="title"><h2>月別経費</h2><input id="eMonth" type="month" class="compact"></div><div class="stats"><div class="stat"><b id="eTotal">¥0</b><span>合計</span></div><div class="stat"><b id="eCount">0</b><span>件数</span></div><div class="stat"><b id="eKinds">0</b><span>分類数</span></div></div><div class="table"><table><thead><tr><th>日付</th><th>現場</th><th>分類</th><th>金額</th><th></th></tr></thead><tbody id="eTable"></tbody></table></div></div>
+</section>
+
+<section id="material" class="page">
+  <div class="card"><h2>材料在庫</h2>
+    <div class="grid"><div><label>材料</label><select id="mName"></select></div><div><label>場所</label><select id="mLoc"></select></div><div><label>操作</label><select id="mAction"><option value="in">入庫</option><option value="out">出庫</option><option value="set">直接設定</option></select></div><div><label>数量</label><input id="mQty" type="number"></div><div><label>単位</label><select id="mUnit"><option>枚</option><option>本</option><option>束</option><option>個</option></select></div><div><label>最低在庫</label><input id="mMin" type="number"></div><div><label>単価</label><input id="mPrice" type="number"></div></div>
+    <button id="saveMat" class="primary top">更新</button>
+  </div>
+  <div class="card"><h2>在庫一覧</h2><div class="table"><table><thead><tr><th>材料</th><th>場所</th><th>在庫</th><th>最低</th><th>金額</th><th></th></tr></thead><tbody id="mTable"></tbody></table></div></div>
+</section>
+
+<section id="bill" class="page admin">
+  <div class="card"><h2>請求登録</h2>
+    <div class="grid"><div><label>現場</label><select id="bSite"></select></div><div><label>請求先</label><input id="bClient"></div><div><label>予定日</label><input id="bDate" type="date"></div><div><label>金額</label><input id="bAmount" type="number"></div><div><label>状態</label><select id="bStatus"><option>請求予定</option><option>請求済</option><option>未入金</option><option>入金済み</option></select></div></div>
+    <button id="saveBill" class="primary top">登録</button>
+  </div>
+  <div class="card"><h2>請求一覧</h2><div class="table"><table><thead><tr><th>日付</th><th>現場</th><th>請求先</th><th>金額</th><th>状態</th><th></th></tr></thead><tbody id="bTable"></tbody></table></div></div>
+</section>
+
+<section id="settings" class="page admin">
+  <div class="card"><h2>名前登録</h2><div class="row"><input id="newWorker" placeholder="たけし"><button id="addWorker" class="primary">追加</button></div><div id="workers" class="chips top"></div></div>
+  <div class="card"><h2>現場登録</h2><div class="row"><input id="newSite" placeholder="杉並宮前"><button id="addSite" class="primary">追加</button></div><div id="sites" class="chips top"></div></div>
+  <div class="card"><h2>ユーザー権限</h2><div id="users"></div></div>
+</section>
+</main>
+</section>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
